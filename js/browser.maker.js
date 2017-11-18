@@ -534,6 +534,8 @@ var MakerJs;
      */
     MakerJs.pathType = {
         Line: "line",
+		Line3D: "line3D", // --> Modification from the original maker.js library
+		Face3D: "face3D", // --> Modification from the original maker.js library
         Circle: "circle",
         Arc: "arc",
         BezierSeed: "bezier-seed"
@@ -1876,6 +1878,53 @@ var MakerJs;
             return Line;
         }());
         paths.Line = Line;
+		
+		/**
+         * Class for 3D line path.
+		 * --> Modification from original maker.js library 
+         */
+        var Line3D = (function () {
+            function Line3D() {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                this.type = MakerJs.pathType.Line3D;
+				switch (args.length) {
+                    case 1:
+                        var points = args[0];
+                        this.origin = points[0];
+                        this.end = points[1];
+                        break;
+                    case 2:
+                        this.origin = args[0];
+                        this.end = args[1];
+                        break;
+                }
+            }
+            return Line3D;
+        }());
+        paths.Line3D = Line3D;
+		
+		/**
+         * Class for 3D face.
+		 * --> Modification from original maker.js library 
+         */
+        var Face3D = (function () {
+            function Face3D() {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                this.type = MakerJs.pathType.Face3D;
+							
+				this.face = [args[0],args[1],args[2],args[3]];                        
+                        
+            }
+            return Face3D;
+        }());
+        paths.Face3D = Face3D;		
+		
         /**
          * Class for chord, which is simply a line path that connects the endpoints of an arc.
          *
@@ -4276,6 +4325,54 @@ var MakerJs;
                 append("21");
                 append(line.end[1] + offset[1]);
             };
+			map[MakerJs.pathType.Line3D] = function (id, line, offset, layer) { // --> Modification from the original maker.js library
+                append("0");
+                append("LINE");
+                append("8");
+                append(defaultLayer(line, layer));
+                append("10");
+                append(line.origin[0]);
+                append("20");
+                append(line.origin[1]);
+                append("30");
+                append(line.origin[2]);				
+                append("11");
+                append(line.end[0]);
+                append("21");
+                append(line.end[1]);
+                append("31");
+                append(line.end[2]);				
+            };
+			map[MakerJs.pathType.Face3D] = function (id, face3d, offset, layer) { // --> Modification from the original maker.js library
+                append("0");
+                append("3DFACE");
+                append("8");
+                append(defaultLayer(face3d.face, layer));
+                append("10");
+                append(face3d.face[0][0]);
+                append("20");
+                append(face3d.face[0][1]);
+                append("30");
+                append(face3d.face[0][2]);	
+                append("11");
+                append(face3d.face[1][0]);
+                append("21");
+                append(face3d.face[1][1]);
+                append("31");
+                append(face3d.face[1][2]);	
+                append("12");
+                append(face3d.face[2][0]);
+                append("22");
+                append(face3d.face[2][1]);
+                append("32");
+                append(face3d.face[2][2]);	
+                append("13");
+                append(face3d.face[3][0]);
+                append("23");
+                append(face3d.face[3][1]);
+                append("33");
+                append(face3d.face[3][2]);	                               
+            };			
             map[MakerJs.pathType.Circle] = function (id, circle, offset, layer) {
                 append("0");
                 append("CIRCLE");
